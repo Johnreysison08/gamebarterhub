@@ -1,0 +1,105 @@
+/* ═══════════════════════════════════════════════
+   MY.CSS — "My" account hub (Buyacc-style)
+═══════════════════════════════════════════════ */
+.my-wrap { max-width: 768px; margin: 0 auto; padding-bottom: 40px; }
+
+/* ── Header ── */
+.my-hero {
+  position: relative; overflow: hidden;
+  padding: 22px 16px 18px;
+  background:
+    radial-gradient(420px 220px at 90% -10%, rgba(124,92,255,0.35), transparent 70%),
+    linear-gradient(180deg, #17205a 0%, #0c1230 60%, var(--bg-deep) 100%);
+}
+.my-hero::after { /* faint big glyph like the reference */
+  content: '🎮'; position: absolute; right: 24px; top: 10px; font-size: 6.5rem; opacity: 0.07; transform: rotate(14deg); pointer-events: none;
+}
+.my-user { display: flex; align-items: center; gap: 14px; position: relative; z-index: 1; }
+.my-avatar {
+  width: 56px; height: 56px; flex: 0 0 56px; border-radius: 50%;
+  background: #5a5fc7; color: #fff; font-size: 1.5rem; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.my-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.my-name { font-size: 1.05rem; font-weight: 800; letter-spacing: -0.2px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.my-verified { font-size: 0.62rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: rgba(34,197,94,0.16); color: #4ade80; border: 1px solid rgba(34,197,94,0.35); }
+.my-uid { font-size: 0.74rem; color: #9fb0ee; display: flex; align-items: center; gap: 6px; margin-top: 2px; }
+.my-uid button { background: none; border: none; color: inherit; cursor: pointer; padding: 2px; display: inline-flex; }
+.my-uid svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; }
+.my-gear {
+  margin-left: auto; width: 36px; height: 36px; border-radius: 10px;
+  background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+  color: #cfd8ff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+.my-gear svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Quick links ── */
+.my-quick { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 22px; position: relative; z-index: 1; }
+.my-quick button {
+  background: none; border: none; color: #fff; cursor: pointer; font-family: inherit;
+  display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.74rem; font-weight: 600; padding: 4px;
+}
+.q-ico { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 1rem; background: linear-gradient(135deg, #5b6cff, #7c5cff); box-shadow: 0 4px 14px rgba(91,108,255,0.45); }
+.my-quick button.on .q-ico { box-shadow: 0 0 0 2px #fff, 0 4px 14px rgba(91,108,255,0.6); }
+
+/* ── Status cards (Offers Sent / Received) ── */
+.my-card { margin: 12px 16px 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; }
+.my-card h3 { font-size: 0.95rem; font-weight: 800; padding: 14px 16px 2px; }
+.my-tiles { display: grid; grid-template-columns: repeat(4, 1fr); padding: 6px 4px 12px; }
+.my-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 7px; text-decoration: none;
+  color: var(--text-secondary); font-size: 0.7rem; padding: 8px 2px; border-radius: 10px; transition: background .15s, color .15s;
+}
+.my-tile:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+.my-tile .ti { position: relative; width: 26px; height: 26px; color: #dfe6ff; }
+.my-tile .ti svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.t-badge {
+  position: absolute; top: -6px; right: -8px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px;
+  background: #e11d48; color: #fff; font-size: 0.62rem; font-weight: 700; display: none; align-items: center; justify-content: center;
+}
+
+/* ── Menu list ── */
+.my-menu { margin: 12px 16px 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.my-row {
+  display: flex; align-items: center; gap: 12px; width: 100%; background: none; border: none; font-family: inherit;
+  color: var(--text-primary); font-size: 0.92rem; font-weight: 500; text-align: left; text-decoration: none;
+  padding: 0 16px; min-height: 60px; cursor: pointer; transition: background .15s;
+}
+.my-row + .my-row { border-top: 1px solid var(--border); }
+.my-row:hover { background: rgba(255,255,255,0.03); }
+.my-row .ri { width: 18px; height: 18px; color: var(--text-secondary); flex: 0 0 18px; }
+.my-row .ri svg, .my-row .chev svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.my-row .rv { margin-left: auto; font-size: 0.8rem; color: var(--accent-cyan); }
+.my-row .rv + .chev, .my-row .chev { width: 16px; height: 16px; color: var(--text-muted); flex: 0 0 16px; }
+.my-row:not(:has(.rv)) .chev { margin-left: auto; }
+
+.my-logout {
+  margin: 12px 16px 0; width: calc(100% - 32px); min-height: 44px; border-radius: 10px;
+  background: var(--bg-card2); border: 1px solid var(--border); color: var(--text-secondary);
+  font-family: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.my-logout:hover { color: #ff6b85; border-color: rgba(255,77,109,0.4); }
+.my-logout svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Listings panel ── */
+.my-list { margin: 22px 16px 0; scroll-margin-top: 80px; }
+.my-list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.my-list-head h3 { font-size: 1.05rem; font-weight: 800; }
+
+@media (min-width: 769px) {
+  .my-hero { border-radius: 0 0 18px 18px; }
+}
+
+/* ── Account details (read-only block in Edit Profile) ── */
+.acct-details { background: var(--bg-card2); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 20px; overflow: hidden; }
+.acct-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; }
+.acct-row + .acct-row { border-top: 1px solid var(--border); }
+.acct-ico { font-size: 1.05rem; line-height: 1.4; flex: 0 0 22px; text-align: center; }
+.acct-body { min-width: 0; }
+.acct-lbl { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.acct-val { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-top: 2px; overflow-wrap: anywhere; }
+
+/* ── Change password ── */
+.pw-show { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; margin-bottom: 6px; }
+.pw-show input { accent-color: var(--accent-cyan); }

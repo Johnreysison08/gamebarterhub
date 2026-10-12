@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trade Details — GameBarterHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/notification.css">
+  <link rel="stylesheet" href="css/support.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/product.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <!-- Firebase Init -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5-g1bjXfgd1w9boHbfLX8EMnt6tr9yuM",
+      authDomain: "gbhub-25a16.firebaseapp.com",
+      projectId: "gbhub-25a16",
+      storageBucket: "gbhub-25a16.firebasestorage.app",
+      messagingSenderId: "1031854442872",
+      appId: "1:1031854442872:web:208bc4663cace89f43608d",
+      measurementId: "G-XV7WMV0Q82"
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+  </script>
+</head>
+<body class="page-product">
+
+<!-- Navbar injected by navbar-template.js -->
+
+<!-- Modal shell (still used by notifications / shared helpers) -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle">Trade Details</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+<div id="editTradeOverlay" class="modal-overlay" onclick="if(event.target===this)closeEditTradeModal()"></div>
+
+<nav class="pd-crumbs" id="pdCrumbs" aria-label="Breadcrumb"></nav>
+
+<main class="pd-wrap" id="pdMain">
+  <p style="color:var(--text-muted);padding:40px 0;grid-column:1/-1;text-align:center">Loading…</p>
+</main>
+
+<div class="pd-bar" id="pdBar" style="display:none"><div class="pd-bar-in" id="pdBarIn"></div></div>
+
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/notification.js"></script>
+<script src="js/call.js"></script>
+<script src="js/navbar-template.js"></script>
+<script src="js/support.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/trades.js"></script>
+<script src="js/offers.js"></script>
+<script>
+  const TRADE_ID = new URLSearchParams(location.search).get('id');
+  let _trade = null;
+
+  function isImgSrc(v) { return v && (v.startsWith('data:') || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(v)); }
+
+  // remember what the user opened (shown under My → Browsing history)
+  function pushHistory(id) {
+    try {
+      const a = JSON.parse(localStorage.getItem('gbh_history') || '[]').filter(x => x !== id);
+      a.unshift(id); localStorage.setItem('gbh_history', JSON.stringify(a.slice(0, 30)));
+    } catch (_) {}
+  }
+
+  async function refreshProduct() { await loadProduct(); }
+
+  async function loadProduct() {
+    if (!TRADE_ID) { location.replace('browse.html'); return; }
+    await restoreSession();
+    try { _trade = await apiGet('/trades/' + TRADE_ID); }
+    catch (e) {
+      document.getElementById('pdMain').innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">🔍</div><p>This trade is no longer available.<br><a href="browse.html" style="color:var(--accent-cyan)">Back to Browse →</a></p></div>`;
+      return;
+    }
+    pushHistory(TRADE_ID);
+    renderProduct();
+  }
+
+  async function renderProduct() {
+    const t = _trade;
+    const game = GAMES.find(g => g.id === t.game) || { name: t.game, icon: '🎮' };
+    const isSold = t.status === 'sold', isPending = t.status === 'pending';
+    const isOwner = !!state.currentUser && state.currentUser.email === t.userEmail;
+    document.title = t.title + ' — GameBarterHub';
+
+    document.getElementById('pdCrumbs').innerHTML =
+      `<a href="index.html">Home</a><span>›</span><a href="browse.html">Browse</a><span>›</span><a href="browse.html?game=${t.game}">${game.name}</a><span>›</span><span>${escapeHtml(t.title)}</span>`;
+
+    const statusCls = isSold ? 'sold' : isPending ? 'pending' : 'available';
+    const statusTxt = isSold ? '🔴 Sold out' : isPending ? '🤝 Trade pending' : '🟢 Available';
+    const imgInner = isImgSrc(t.img) ? `<img src="${t.img}" alt="">` : (t.img ? t.img : '🖼️');
+
+    // seller rating + my existing offer (both optional)
+    let rating = null, mine = null;
+    try { if (typeof getUserRatingSummary === 'function' && t.userId) rating = await getUserRatingSummary(t.userId); } catch (_) {}
+    try { if (state.currentUser && !isOwner) mine = await getMyOfferForTrade(t.id); } catch (_) {}
+    const hasLive = mine && (mine.status === 'pending' || mine.status === 'accepted' || mine.status === 'countered');
+
+    const wants = t.offer
+      ? `<b>${escapeHtml(t.offer)}</b>`
+      : `<b class="none">Open to any offer</b>`;
+
+    document.getElementById('pdMain').innerHTML = `
+      <section class="pd-gallery">
+        <div class="pd-img" style="${isSold ? 'filter:grayscale(.35)' : ''}">${imgInner}
+          <span class="pd-status ${statusCls}">${statusTxt}</span>
+          <span class="pd-count">1/1</span>
+        </div>
+      </section>
+
+      <section class="pd-info">
+        ${hasLive ? `<div class="pd-nego" style="display:block"><b>Trade negotiation in progress</b>
+          You offered <i>${escapeHtml(mine.offerItem || '')}</i> — ${mine.status === 'accepted' ? 'the owner accepted. Open it to finish the trade.' : 'waiting for the owner to respond.'}
+          <div class="row"><a class="btn btn-primary" href="offers.html?view=sent">View offer</a>${mine.status === 'pending' ? `<button class="btn btn-ghost" onclick="cancelOfferFromModal('${mine.id}')">Cancel offer</button>` : ''}</div></div>` : ''}
+
+        <div class="pd-price"><small>Looking for</small>${wants}</div>
+        <h1 class="pd-title">${escapeHtml(t.title)}<span class="pd-time">${formatTime(t.created_at)}</span></h1>
+
+        <div class="pd-tags">
+          <span class="pd-tag">${game.icon} ${game.name}</span>
+          <span class="pd-tag green">✓ Both sides confirm</span>
+          <span class="pd-tag">⏱ 7-day offer window</span>
+        </div>
+
+        ${isOwner ? `<div class="pd-card"><h2>Manage your listing</h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="openEditModal('${t.id}')">✏️ Edit</button>
+            <button class="btn btn-ghost" onclick="toggleSoldStatus('${t.id}', null, null).then(refreshProduct)">${isSold ? '✅ Mark available' : '🔴 Mark sold'}</button>
+            <button class="btn btn-ghost" style="color:#ff5555" onclick="deleteTrade('${t.id}')">🗑️ Delete</button>
+            <a class="btn btn-primary" href="offers.html">🤝 View offers</a>
+          </div></div>` : ''}
+
+        <div class="pd-card"><h2>Seller Notes</h2><div class="pd-notes">${escapeHtml(t.desc || 'No description provided.')}</div></div>
+
+        <div class="pd-card"><h2>Trade Protection <small>GameBarterHub</small></h2>
+          <ul class="pd-checks">
+            <li><span><b>Both sides confirm.</b> A trade only completes after the owner and the offerer each confirm it.</span></li>
+            <li><span><b>Keep it in chat.</b> Negotiate in built-in chat and offers so there is a record if something goes wrong.</span></li>
+            <li><span><b>Offers auto-expire</b> after 7 days, and you can rate each other once the trade is done.</span></li>
+          </ul></div>
+
+        <div class="pd-card"><h2>Trade Details</h2>
+          <div class="pd-grid">
+            <div><span>Game</span><b>${game.name}</b></div>
+            <div><span>Status</span><b>${isSold ? 'Sold out' : isPending ? 'Trade pending' : 'Available'}</b></div>
+            <div><span>Listed</span><b>${formatTime(t.created_at)}</b></div>
+            <div><span>Likes</span><b>${t.likes || 0}</b></div>
+          </div></div>
+
+        <div class="pd-card"><h2>Seller</h2>
+          <div class="pd-seller">
+            <div class="mini-avatar" onclick="viewUserProfile('${t.userEmail || ''}','${escapeHtml(t.user)}')">${getAvatarEl(t.user, t.userAvatar)}</div>
+            <div>
+              <div class="pd-seller-name" onclick="viewUserProfile('${t.userEmail || ''}','${escapeHtml(t.user)}')">${escapeHtml(t.user)}</div>
+              <small>${rating && rating.count ? '⭐ ' + rating.avg.toFixed(1) + ' · ' + rating.count + ' trade ratings' : 'No ratings yet'}</small>
+            </div>
+            ${isOwner ? '' : `<button class="btn btn-ghost" onclick="viewUserProfile('${t.userEmail || ''}','${escapeHtml(t.user)}')">View profile</button>`}
+          </div></div>
+
+        <div id="offerFormArea" data-open="0"></div>
+
+        <div class="pd-card"><h2>Comments <small><span id="modalCommentCount">${(t.comments || []).length}</span></small></h2>
+          <div style="margin-bottom:12px">
+            <button class="action-btn modal-like-btn ${t.likedByMe ? 'liked' : ''}" style="font-size:0.88rem" onclick="toggleLikeInModal('${t.id}', this)">${t.likedByMe ? '❤️' : '🤍'} <span class="like-count">${t.likes || 0}</span> Likes</button>
+            <button class="action-btn" style="font-size:0.88rem" onclick="shareTrade('${t.id}','${escapeHtml(t.title)}',event)">🔗 Share</button>
+          </div>
+          <div class="comments-list" id="modalCommentsList">${renderComments(t.comments || [], t.id)}</div>
+          ${state.currentUser ? `<div style="position:relative"><textarea class="form-input" id="commentInput" placeholder="Write a comment…" style="min-height:52px;border-radius:10px;padding-right:80px;resize:none" onkeydown="handleCommentKey(event,'${t.id}')"></textarea>
+            <button class="btn btn-primary" style="position:absolute;right:8px;bottom:8px;padding:6px 14px;font-size:0.78rem;min-height:0" onclick="addComment('${t.id}')">Post</button></div>`
+            : `<p style="font-size:0.82rem;color:var(--text-muted)"><a href="login.html" style="color:var(--accent-cyan)">Sign in</a> to comment.</p>`}
+        </div>
+      </section>`;
+
+    // ── sticky action bar ──
+    const bar = document.getElementById('pdBar');
+    bar.style.display = 'block';
+    const chatBtn = `<button class="btn btn-ghost btn-chat" onclick="goContact('${(t.user || '').replace(/'/g, "\\'")}','${t.userEmail || ''}','${t.userId || ''}','${t.userAvatar || ''}')">💬 Chat</button>`;
+    let main;
+    if (isOwner)        main = `<a class="btn btn-primary" href="offers.html">🤝 View offers</a>`;
+    else if (isSold)    main = `<button class="btn btn-primary" disabled>Sold out</button>`;
+    else if (isPending) main = `<button class="btn btn-primary" disabled>Trade pending</button>`;
+    else if (hasLive)   main = `<a class="btn btn-primary" href="offers.html?view=sent">View my offer</a>`;
+    else                main = `<button class="btn btn-primary" onclick="openOffer()">🤝 Make Offer</button>`;
+    document.getElementById('pdBarIn').innerHTML =
+      `<div class="pd-mini"><small>Looking for</small><b>${escapeHtml(t.offer || 'Open to offers')}</b></div>${isOwner ? '' : chatBtn}${main}`;
+  }
+
+  async function openOffer() {
+    const el = document.getElementById('offerFormArea');
+    if (el && el.dataset.open !== '1') await toggleOfferForm(TRADE_ID);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  loadProduct();
+</script>
+</body>
+</html>

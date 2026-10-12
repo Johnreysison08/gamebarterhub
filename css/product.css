@@ -1,0 +1,93 @@
+/* ═══════════════════════════════════════════════
+   PRODUCT.CSS — Trade detail page (Buyacc-style)
+═══════════════════════════════════════════════ */
+body.page-product { padding-bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+.page-product .bottom-nav { display: none !important; }
+
+.pd-crumbs { max-width: 1100px; margin: 0 auto; padding: 14px 24px 0; font-size: 0.78rem; color: var(--text-muted); display: flex; gap: 6px; flex-wrap: wrap; }
+.pd-crumbs a { color: var(--text-secondary); text-decoration: none; }
+.pd-crumbs a:hover { color: var(--accent-cyan); }
+
+.pd-wrap { max-width: 1100px; margin: 0 auto; padding: 14px 24px 24px; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 28px; align-items: start; }
+
+/* ── Gallery ── */
+.pd-gallery { position: sticky; top: calc(var(--nav-h) + 16px); }
+.pd-img {
+  position: relative; border-radius: 16px; overflow: hidden; aspect-ratio: 4 / 3;
+  background: linear-gradient(135deg, #0e1525, #1a2440); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 6rem;
+}
+.pd-img img { width: 100%; height: 100%; object-fit: cover; }
+.pd-count { position: absolute; right: 12px; bottom: 12px; background: rgba(5,8,16,0.72); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+.pd-status { position: absolute; left: 12px; top: 12px; font-size: 0.7rem; font-weight: 700; padding: 4px 11px; border-radius: 99px; backdrop-filter: blur(6px); }
+.pd-status.available { background: rgba(5,150,105,0.9); color: #fff; }
+.pd-status.pending   { background: rgba(255,193,7,0.95); color: #1a1a1a; }
+.pd-status.sold      { background: rgba(220,38,38,0.92); color: #fff; }
+
+/* ── Info column ── */
+.pd-info { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.pd-price { display: flex; flex-direction: column; gap: 2px; }
+.pd-price small { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-muted); }
+.pd-price b { font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px; color: #fff; overflow-wrap: anywhere; line-height: 1.2; }
+.pd-price b.none { font-size: 1.1rem; color: var(--text-secondary); }
+.pd-title { font-size: 1.15rem; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.pd-time { font-size: 0.74rem; color: var(--text-muted); font-weight: 500; }
+.pd-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.pd-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.72rem; font-weight: 700; padding: 5px 11px; border-radius: 8px; background: rgba(91,108,255,0.12); color: #aab4ff; border: 1px solid rgba(91,108,255,0.28); }
+.pd-tag.green { background: rgba(34,197,94,0.1); color: #4ade80; border-color: rgba(34,197,94,0.28); }
+
+.pd-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
+.pd-card h2 { font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.pd-card h2 small { margin-left: auto; font-weight: 500; font-size: 0.72rem; color: var(--text-muted); }
+.pd-notes { color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+.pd-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--border); border-radius: 10px; overflow: hidden; }
+.pd-grid div { background: var(--bg-card2); padding: 11px 14px; }
+.pd-grid span { display: block; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 2px; }
+.pd-grid b { font-size: 0.92rem; font-weight: 700; }
+
+.pd-checks { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+.pd-checks li { display: flex; gap: 10px; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; }
+.pd-checks li::before { content: '✓'; flex: 0 0 20px; height: 20px; border-radius: 50%; background: rgba(34,197,94,0.15); color: #4ade80; font-size: 0.72rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.pd-checks b { color: var(--text-primary); }
+
+.pd-seller { display: flex; align-items: center; gap: 12px; }
+.pd-seller .mini-avatar { width: 44px; height: 44px; font-size: 1.05rem; cursor: pointer; }
+.pd-seller-name { font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.pd-seller-name:hover { color: var(--accent-cyan); }
+.pd-seller small { color: var(--text-muted); font-size: 0.75rem; }
+.pd-seller .btn { margin-left: auto; }
+
+/* negotiation banner (Buyacc: "Product negotiation in progress") */
+.pd-nego { display: none; background: rgba(245,166,35,0.1); border: 1px solid rgba(245,166,35,0.35); border-radius: 12px; padding: 12px 14px; font-size: 0.82rem; color: #f7c06a; line-height: 1.5; }
+.pd-nego b { color: #ffd592; display: block; margin-bottom: 2px; }
+.pd-nego .row { display: flex; gap: 8px; margin-top: 10px; }
+.pd-nego .btn { min-height: 34px; padding: 6px 14px; font-size: 0.78rem; }
+
+/* ── Sticky action bar ── */
+.pd-bar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 995;
+  background: rgba(8,12,24,0.97); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--border);
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+}
+.pd-bar-in { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; gap: 10px; }
+.pd-bar .pd-mini { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pd-bar .pd-mini small { font-size: 0.64rem; letter-spacing: 0.6px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; }
+.pd-bar .pd-mini b { font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pd-bar .btn { min-height: 46px; padding: 0 22px; font-size: 0.92rem; border-radius: 12px; }
+.pd-bar .btn-chat { padding: 0 16px; }
+.pd-bar .btn[disabled] { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+@media (max-width: 860px) {
+  .pd-wrap { grid-template-columns: 1fr; padding: 10px 16px 16px; gap: 16px; }
+  .pd-crumbs { padding: 10px 16px 0; }
+  .pd-gallery { position: static; }
+  .pd-img { border-radius: 14px; aspect-ratio: 16 / 11; }
+  .pd-price b { font-size: 1.45rem; }
+}
+@media (max-width: 480px) {
+  .pd-bar .pd-mini { display: none; }
+  .pd-bar .btn { flex: 1; }
+  .pd-bar .btn-chat { flex: 0 0 auto; }
+}

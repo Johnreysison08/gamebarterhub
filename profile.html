@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My — GameBarterHub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/notification.css">
+  <link rel="stylesheet" href="css/support.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/my.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <!-- Firebase Init -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5-g1bjXfgd1w9boHbfLX8EMnt6tr9yuM",
+      authDomain: "gbhub-25a16.firebaseapp.com",
+      projectId: "gbhub-25a16",
+      storageBucket: "gbhub-25a16.firebasestorage.app",
+      messagingSenderId: "1031854442872",
+      appId: "1:1031854442872:web:208bc4663cace89f43608d",
+      measurementId: "G-XV7WMV0Q82"
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+  </script>
+</head>
+<body>
+
+<!-- Navbar injected by navbar-template.js -->
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Trade Details</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<div class="my-wrap">
+
+  <!-- Header -->
+  <section class="my-hero">
+    <div class="my-user">
+      <div class="my-avatar" id="profileAvatarEl">?</div>
+      <div>
+        <div class="my-name"><span id="profileNameEl">—</span><span class="my-verified" id="profileVerifiedEl" style="display:none">✓ Verified</span></div>
+        <div class="my-uid"><span id="profileUidEl">UID: —</span><button onclick="copyUid()" aria-label="Copy UID"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg></button></div>
+      </div>
+      <button class="my-gear" onclick="showEditModal()" aria-label="Edit profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5h0a1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+    <div class="my-quick">
+      <button data-tab="mine" class="on" onclick="setListTab('mine')"><span class="q-ico">🏷️</span><span>My Listings</span></button>
+      <button data-tab="liked" onclick="setListTab('liked')"><span class="q-ico">❤️</span><span>Liked</span></button>
+      <button data-tab="history" onclick="setListTab('history')"><span class="q-ico">🕘</span><span>History</span></button>
+    </div>
+  </section>
+
+  <!-- Offers I sent (like "Purchase") -->
+  <section class="my-card">
+    <h3>Offers Sent</h3>
+    <div class="my-tiles">
+      <a class="my-tile" href="offers.html?view=sent&filter=all"><span class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>All</a>
+      <a class="my-tile" href="offers.html?view=sent&filter=pending"><span class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><i class="t-badge" id="bdgSentPending"></i></span>Pending</a>
+      <a class="my-tile" href="offers.html?view=sent&filter=accepted"><span class="ti"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 11l4 3 4-3"/></svg><i class="t-badge" id="bdgSentProg"></i></span>In Progress</a>
+      <a class="my-tile" href="offers.html?view=sent&filter=completed"><span class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 3 3 5-6"/></svg></span>Completed</a>
+    </div>
+  </section>
+
+  <!-- Offers I received (like "Sell") -->
+  <section class="my-card">
+    <h3>Offers Received</h3>
+    <div class="my-tiles">
+      <a class="my-tile" href="offers.html?view=received&filter=all"><span class="ti"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>All</a>
+      <a class="my-tile" href="offers.html?view=received&filter=pending"><span class="ti"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><i class="t-badge" id="bdgRecvPending"></i></span>Pending</a>
+      <a class="my-tile" href="offers.html?view=received&filter=accepted"><span class="ti"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 11l4 3 4-3"/></svg><i class="t-badge" id="bdgRecvProg"></i></span>In Progress</a>
+      <a class="my-tile" href="offers.html?view=received&filter=closed"><span class="ti"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="m9.5 9.5 5 5M14.5 9.5l-5 5"/></svg></span>Closed</a>
+    </div>
+  </section>
+
+  <!-- Menu -->
+  <section class="my-menu">
+    <button class="my-row" onclick="showEditModal()"><span class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></span>Account Information<span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+    <button class="my-row" onclick="showPasswordModal()"><span class="ri"><svg viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>Change Password<span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+    <button class="my-row" onclick="showVerifyInfo()"><span class="ri"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg></span>Verification<span class="rv" id="verifyVal">—</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+    <a class="my-row" href="offers.html?view=received&filter=completed"><span class="ri"><svg viewBox="0 0 24 24"><path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>Trade Ratings<span class="rv" id="ratingVal">No ratings yet</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></a>
+    <button class="my-row" onclick="void 0"><span class="ri"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-5.5 6.5-5.5s6.5 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.8c2 .6 3.5 2.2 3.5 5.2"/></svg></span>Followers / Following<span class="rv" id="followVal">0 / 0</span><span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+    <button class="my-row" onclick="openSupportPanel()"><span class="ri"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.7.4-1 .9-1 1.7M12 17h.01"/></svg></span>Help Center<span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+    <button class="my-row" onclick="toggleNotifPanel()"><span class="ri"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></span>Notification<span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+    <button class="my-row" onclick="openSupportPanel();switchSupportTab('tickets')"><span class="ri"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span>Feedback<span class="chev"><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></span></button>
+  </section>
+
+  <button class="my-logout" onclick="logout()"><svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l-5-5 5-5M5 12h12"/></svg> Log out</button>
+
+  <!-- Listings panel (My Listings / Liked / Browsing history) -->
+  <section class="my-list" id="myList">
+    <div class="my-list-head">
+      <h3 id="listTitle">My Listings</h3>
+      <a href="post-trade.html" class="btn btn-primary" style="font-size:0.8rem;padding:7px 14px;min-height:34px">+ Post a trade</a>
+    </div>
+    <div class="trades-grid" id="myTradesGrid"></div>
+  </section>
+
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editModalOverlay" onclick="closeEditModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Profile</div>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div id="editModalBody">
+      <!-- Account details (read-only): full location, mobile number, email -->
+      <div class="acct-details">
+        <div class="acct-row"><span class="acct-ico">📍</span><div class="acct-body"><div class="acct-lbl">Location</div><div class="acct-val" id="acctLoc">—</div></div></div>
+        <div class="acct-row"><span class="acct-ico">📱</span><div class="acct-body"><div class="acct-lbl">Mobile Number</div><div class="acct-val" id="acctPhone">—</div></div></div>
+        <div class="acct-row"><span class="acct-ico">✉️</span><div class="acct-body"><div class="acct-lbl">Email</div><div class="acct-val" id="acctEmail">—</div></div></div>
+      </div>
+
+      <!-- Avatar upload -->
+      <div class="form-group" style="text-align:center">
+        <label class="form-label">Profile Photo</label>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px">
+          <div id="editAvatarPreview" style="
+            width:72px;height:72px;border-radius:50%;
+            background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));
+            display:flex;align-items:center;justify-content:center;
+            font-size:1.6rem;font-weight:700;color:#0a0e1a;
+            overflow:hidden;cursor:pointer;border:2px solid var(--accent-cyan);
+          " onclick="document.getElementById('editAvatarInput').click()"></div>
+          <button class="btn btn-ghost" style="font-size:0.78rem;padding:6px 14px"
+            onclick="document.getElementById('editAvatarInput').click()">Change Photo</button>
+          <input type="file" id="editAvatarInput" accept="image/*" style="display:none"
+            onchange="previewEditAvatar(this)">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Display Name</label>
+        <input class="form-input" id="editName" type="text">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">State / Province</label>
+          <select class="form-input" id="editState" onchange="onEditStateChange()"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">City / Municipality</label>
+          <select class="form-input" id="editCity" disabled></select>
+        </div>
+      </div>
+      <button class="btn btn-primary full-btn" onclick="saveProfile()" style="margin-top:8px;padding:12px">
+        Save Changes
+      </button>
+      <button class="btn btn-ghost full-btn" onclick="closeEditModal();showPasswordModal()" style="margin-top:10px;padding:11px">
+        🔒 Change Password
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal-overlay" id="pwModalOverlay" onclick="closePasswordModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Change Password</div>
+      <button class="modal-close" onclick="closePasswordModal()">✕</button>
+    </div>
+    <div id="pwError" class="error-msg"></div>
+    <div class="form-group">
+      <label class="form-label">Current Password</label>
+      <input class="form-input" id="pwCurrent" type="password" placeholder="Enter your current password" autocomplete="current-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">New Password</label>
+      <input class="form-input" id="pwNew" type="password" placeholder="At least 6 characters" autocomplete="new-password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirm New Password</label>
+      <input class="form-input" id="pwConfirm" type="password" placeholder="Re-enter new password" autocomplete="new-password"
+        onkeydown="if(event.key==='Enter') submitPasswordChange()">
+    </div>
+    <label class="pw-show"><input type="checkbox" onchange="togglePwVisibility(this.checked)"> Show passwords</label>
+    <button class="btn btn-primary full-btn" id="pwSubmitBtn" onclick="submitPasswordChange()" style="margin-top:8px;padding:12px">
+      Update Password
+    </button>
+  </div>
+</div>
+
+<!-- Edit Trade Overlay (populated dynamically by trades.js) -->
+<div id="editTradeOverlay" class="modal-overlay" onclick="if(event.target===this)closeEditTradeModal()"></div>
+
+<script src="js/ph-locations.js"></script>
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/notification.js"></script>
+<script src="js/call.js"></script>
+<script src="js/navbar-template.js"></script>
+<script src="js/support.js"></script>
+<script src="js/trades.js"></script>
+<script src="js/offers.js"></script>
+<script>
+  let _newAvatarDataURL = null;
+  let _legacyLocation = null;
+
+  let _listTab = 'mine';
+  let _allTrades = [];
+
+  async function initProfile() {
+    await restoreSession();
+    if (!state.currentUser) { window.location.href = 'login.html'; return; }
+    if (typeof startNotifListener === 'function') startNotifListener();
+    await renderProfile();
+    loadOfferCounts();
+  }
+
+  function _shortUid(u) { return 'G' + String(u.uid || u.id || '').replace(/[^a-z0-9]/gi, '').slice(0, 10).toUpperCase(); }
+
+  function copyUid() {
+    const txt = _shortUid(state.currentUser);
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject())
+      .then(() => showToast('UID copied'))
+      .catch(() => showToast(txt));
+  }
+
+  function showVerifyInfo() {
+    const u = state.currentUser;
+    const m = { verified: 'Your account is verified ✅', pending: 'Your ID is waiting for admin review ⏳',
+                rejected: 'Verification was rejected' + (u.rejectionReason ? ': ' + u.rejectionReason : '') };
+    showToast(m[u.verificationStatus] || 'Not verified yet');
+  }
+
+  async function renderProfile() {
+    const u = state.currentUser;
+    const av = document.getElementById('profileAvatarEl');
+    if (u.avatar) av.innerHTML = `<img src="${u.avatar}" alt="">`;
+    else          av.textContent = u.name[0].toUpperCase();
+
+    document.getElementById('profileNameEl').textContent = u.name;
+    document.getElementById('profileUidEl').textContent  = 'UID: ' + _shortUid(u);
+
+    const vs = u.verificationStatus;
+    document.getElementById('profileVerifiedEl').style.display = vs === 'verified' ? 'inline-block' : 'none';
+    const vv = document.getElementById('verifyVal');
+    vv.textContent = vs === 'verified' ? 'Verified' : vs === 'pending' ? 'Pending review' : vs === 'rejected' ? 'Rejected' : 'Not verified';
+    vv.style.color = vs === 'verified' ? '#4ade80' : vs === 'pending' ? '#f5a623' : vs === 'rejected' ? '#ff4d6d' : '';
+
+    try {
+      _allTrades = await apiGet('/trades/user/' + encodeURIComponent(u.email));
+      state.trades = _allTrades;
+      try {
+        const snap = await firebase.firestore().collection('users').doc(u.uid).get();
+        if (snap.exists) {
+          const d = snap.data();
+          document.getElementById('followVal').textContent = (d.followers || []).length + ' / ' + (d.following || []).length;
+        }
+      } catch (_) {}
+      try {
+        if (typeof getUserRatingSummary === 'function') {
+          const r = await getUserRatingSummary(u.uid);
+          if (r.count) document.getElementById('ratingVal').textContent = '⭐ ' + r.avg.toFixed(1) + ' (' + r.count + ')';
+        }
+      } catch (_) {}
+    } catch (_) {}
+    renderMyTrades();
+  }
+
+  // Red badges on the status tiles (pending / in-progress counts)
+  async function loadOfferCounts() {
+    try {
+      const [recv, sent] = await Promise.all([loadOffersReceived(), loadOffersSent()]);
+      const set = (id, n) => { const el = document.getElementById(id); if (el && n) { el.textContent = n > 9 ? '9+' : n; el.style.display = 'flex'; } };
+      set('bdgSentPending', sent.filter(o => o.status === 'pending' || o.status === 'countered').length);
+      set('bdgSentProg',    sent.filter(o => o.status === 'accepted').length);
+      set('bdgRecvPending', recv.filter(o => o.status === 'pending').length);
+      set('bdgRecvProg',    recv.filter(o => o.status === 'accepted').length);
+    } catch (_) {}
+  }
+
+  async function setListTab(tab) {
+    _listTab = tab;
+    document.querySelectorAll('.my-quick button').forEach(b => b.classList.toggle('on', b.dataset.tab === tab));
+    document.getElementById('listTitle').textContent = { mine: 'My Listings', liked: 'Liked', history: 'Browsing history' }[tab];
+    if ((tab === 'liked' || tab === 'history') && !state._allLoaded) {
+      try { await loadTrades(); state._allLoaded = true; } catch (_) {}
+    }
+    renderMyTrades();
+    document.getElementById('myList').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderMyTrades() {
+    let list = [], empty = '';
+    if (_listTab === 'mine') {
+      list = _allTrades;
+      empty = `You haven't posted any trades yet.<br><a href="post-trade.html" style="color:var(--accent-cyan)">Create your first post →</a>`;
+    } else if (_listTab === 'liked') {
+      list = state.trades.filter(t => t.likedByMe);
+      empty = 'Trades you like will show up here.';
+    } else {
+      let ids = []; try { ids = JSON.parse(localStorage.getItem('gbh_history') || '[]'); } catch (_) {}
+      list = ids.map(id => state.trades.find(t => t.id === id)).filter(Boolean);
+      empty = 'Trades you open will show up here.';
+    }
+    document.getElementById('myTradesGrid').innerHTML = list.length
+      ? list.map(t => tradeCardHTML(t, _listTab === 'mine')).join('')
+      : `<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📦</div><p>${empty}</p></div>`;
+  }
+
+  // ── Location helpers ──────────────────────────
+  // New saves are stored as "City, Province". Older accounts only stored the
+  // city, so we try to work the province out from the PSGC list when it's
+  // unambiguous (e.g. "Olongapo City" → Zambales).
+  function _parseLocation(loc) {
+    loc = (loc || '').trim();
+    if (!loc) return { city: '', province: '', full: '' };
+    const parts = loc.split(',').map(s => s.trim()).filter(Boolean);
+    const city = parts[0] || '';
+    let province = '';
+    if (parts[1] && PH_LOCATIONS[parts[1]] && PH_LOCATIONS[parts[1]].includes(city)) {
+      province = parts[1];
+    } else {
+      const hits = Object.keys(PH_LOCATIONS).filter(p => PH_LOCATIONS[p].includes(city));
+      if (hits.length === 1) province = hits[0];
+    }
+    const known = province && PH_LOCATIONS[province].includes(city);
+    const full = known ? city + ', ' + province + ', Philippines' : loc;
+    return { city: known ? city : '', province: known ? province : '', full };
+  }
+
+  function _formatPhone(p) {
+    const d = String(p || '').replace(/\D/g, '');
+    return d.length === 11 ? d.slice(0, 4) + ' ' + d.slice(4, 7) + ' ' + d.slice(7) : (p || '');
+  }
+
+  function onEditStateChange() {
+    populatePHLocations(document.getElementById('editState').value, document.getElementById('editCity'));
+  }
+
+  function renderAccountDetails() {
+    const u = state.currentUser;
+    const loc = _parseLocation(u.location);
+    document.getElementById('acctLoc').textContent   = loc.full || 'Not set';
+    document.getElementById('acctPhone').textContent = _formatPhone(u.phone) || 'Not set';
+    document.getElementById('acctEmail').textContent = u.email || 'Not set';
+  }
+
+  function showEditModal() {
+    const u = state.currentUser;
+    _newAvatarDataURL = null;
+    document.getElementById('editName').value = u.name;
+
+    renderAccountDetails();
+    const loc = _parseLocation(u.location);
+    _legacyLocation = (u.location && !loc.city) ? u.location : null; // free-text value we can't map to a dropdown
+    populatePHStates(document.getElementById('editState'));
+    document.getElementById('editState').value = loc.province;
+    populatePHLocations(loc.province, document.getElementById('editCity'));
+    document.getElementById('editCity').value = loc.city;
+
+    const prev = document.getElementById('editAvatarPreview');
+    if (u.avatar) prev.innerHTML = `<img src="${u.avatar}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+    else          prev.textContent = u.name[0].toUpperCase();
+
+    document.getElementById('editModalOverlay').classList.add('open');
+  }
+
+  function previewEditAvatar(input) {
+    if (!input.files[0]) return;
+    const r = new FileReader();
+    r.onload = e => {
+      _newAvatarDataURL = e.target.result;
+      const prev = document.getElementById('editAvatarPreview');
+      prev.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover" alt="">`;
+    };
+    r.readAsDataURL(input.files[0]);
+  }
+
+  function closeEditModal(e) {
+    if (e && e.target !== document.getElementById('editModalOverlay')) return;
+    document.getElementById('editModalOverlay').classList.remove('open');
+  }
+
+  async function saveProfile() {
+    const name = document.getElementById('editName').value.trim();
+    const prov = document.getElementById('editState').value;
+    const city = document.getElementById('editCity').value;
+    if (!name) { showToast('Name cannot be empty', 'error'); return; }
+    if (prov && !city) { showToast('Please select your city / municipality', 'error'); return; }
+    // "City, Province"; keep an old free-text location untouched if nothing new was picked
+    const loc = city ? city + ', ' + prov : (_legacyLocation || '');
+
+    try {
+      const { user } = await apiPut('/auth/profile', {
+        name, location: loc,
+        avatar: _newAvatarDataURL || state.currentUser.avatar || null,
+      });
+      state.currentUser = user;
+      document.getElementById('editModalOverlay').classList.remove('open');
+      showToast('✅ Profile updated!');
+      renderProfile();
+      updateNavUser();
+      _newAvatarDataURL = null;
+    } catch (e) {
+      showToast(e.message || 'Could not save profile.', 'error');
+    }
+  }
+
+  // ── Change password ───────────────────────────
+  function showPasswordModal() {
+    ['pwCurrent', 'pwNew', 'pwConfirm'].forEach(id => { const el = document.getElementById(id); el.value = ''; el.type = 'password'; });
+    document.querySelector('#pwModalOverlay .pw-show input').checked = false;
+    document.getElementById('pwError').style.display = 'none';
+    document.getElementById('pwModalOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('pwCurrent').focus(), 150);
+  }
+
+  function closePasswordModal(e) {
+    if (e && e.target !== document.getElementById('pwModalOverlay')) return;
+    document.getElementById('pwModalOverlay').classList.remove('open');
+  }
+
+  function togglePwVisibility(show) {
+    ['pwCurrent', 'pwNew', 'pwConfirm'].forEach(id => { document.getElementById(id).type = show ? 'text' : 'password'; });
+  }
+
+  async function submitPasswordChange() {
+    const err     = document.getElementById('pwError');
+    const btn     = document.getElementById('pwSubmitBtn');
+    const current = document.getElementById('pwCurrent').value;
+    const next    = document.getElementById('pwNew').value;
+    const confirm = document.getElementById('pwConfirm').value;
+    err.style.display = 'none';
+
+    if (!current || !next || !confirm) return showErr(err, 'Please fill in all fields.');
+    if (next.length < 6)               return showErr(err, 'New password must be at least 6 characters.');
+    if (next !== confirm)              return showErr(err, 'New passwords do not match.');
+    if (next === current)              return showErr(err, 'New password must be different from your current password.');
+
+    btn.disabled = true; btn.textContent = 'Updating…';
+    try {
+      await changePassword(current, next);
+      document.getElementById('pwModalOverlay').classList.remove('open');
+      showToast('✅ Password updated!');
+    } catch (e) {
+      const c = (e && e.code) || '';
+      let msg = e.message || 'Could not change password.';
+      if (c === 'auth/wrong-password' || c === 'auth/invalid-credential' || c === 'auth/invalid-login-credentials')
+        msg = 'Your current password is incorrect.';
+      else if (c === 'auth/weak-password')            msg = 'New password is too weak. Use at least 6 characters.';
+      else if (c === 'auth/too-many-requests')        msg = 'Too many attempts. Please wait a few minutes and try again.';
+      else if (c === 'auth/network-request-failed')   msg = 'Network error. Check your connection and try again.';
+      else if (c === 'auth/requires-recent-login')    msg = 'Please log out and log back in, then try again.';
+      showErr(err, msg);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Update Password';
+    }
+  }
+
+  initProfile();
+</script>
+</body>
+</html>

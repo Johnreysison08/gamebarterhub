@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GameBarterHub — Game Item Trading Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/navbar.css">
+  <link rel="stylesheet" href="css/notification.css">
+  <link rel="stylesheet" href="css/support.css">
+  <link rel="stylesheet" href="css/cards.css">
+  <link rel="stylesheet" href="css/forms.css">
+  <style>
+    /* ── HERO CAROUSEL ── */
+    .hero-wrap { max-width: 1200px; margin: 0 auto; padding: 20px 24px 0; }
+    .carousel { position: relative; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); }
+    .slides { display: flex; transition: transform 0.55s cubic-bezier(.4,0,.2,1); }
+    .slide {
+      flex: 0 0 100%; min-height: 340px;
+      padding: 48px 56px; display: flex; flex-direction: column; justify-content: center; gap: 14px;
+      position: relative; isolation: isolate;
+    }
+    .slide::after { /* soft decorative glow */
+      content: ''; position: absolute; width: 420px; height: 420px; right: -80px; top: -120px;
+      border-radius: 50%; filter: blur(70px); opacity: 0.45; z-index: -1;
+    }
+    .slide-1 { background: linear-gradient(120deg, #0d1b2a 0%, #12263f 60%, #17325a 100%); }
+    .slide-1::after { background: var(--accent-cyan); }
+    .slide-2 { background: linear-gradient(120deg, #231409 0%, #3a1d0c 60%, #5a2a0e 100%); }
+    .slide-2::after { background: var(--accent-orange); }
+    .slide-3 { background: linear-gradient(120deg, #170f2b 0%, #261647 60%, #3a2268 100%); }
+    .slide-3::after { background: var(--accent-purple); }
+    .slide-emoji { position: absolute; right: 56px; bottom: 28px; font-size: 7rem; opacity: 0.9; z-index: -1; filter: drop-shadow(0 12px 30px rgba(0,0,0,0.4)); }
+    .slide-kicker {
+      display: inline-flex; align-self: flex-start; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14);
+      padding: 5px 14px; border-radius: 999px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+    }
+    .slide-kicker::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-green); box-shadow: 0 0 8px var(--accent-green); }
+    .slide h1, .slide h2 {
+      font-family: var(--font-head); font-weight: 800; letter-spacing: -1px; line-height: 1.08;
+      font-size: clamp(1.9rem, 4.4vw, 3.2rem); max-width: 640px;
+    }
+    .slide h1 em, .slide h2 em { font-style: normal; color: var(--accent-cyan); }
+    .slide-2 h2 em { color: var(--accent-orange); }
+    .slide-3 h2 em { color: #b69cff; }
+    .slide p { color: #c3cce0; font-size: 1rem; max-width: 520px; line-height: 1.6; }
+    .slide-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+    .slide-actions .btn { padding: 12px 24px; font-size: 0.92rem; }
+
+    .hero-search { max-width: 520px; position: relative; margin-top: 4px; }
+    .hero-search input {
+      width: 100%; height: 50px; background: rgba(10,13,19,0.7);
+      border: 1px solid rgba(255,255,255,0.16); border-radius: 999px;
+      padding: 0 60px 0 22px; font-family: var(--font-body); font-size: 0.95rem;
+      color: var(--text-primary); outline: none; transition: border-color 0.2s;
+    }
+    .hero-search input:focus { border-color: var(--accent-cyan); }
+    .hero-search input::placeholder { color: var(--text-muted); }
+    .hero-search button {
+      position: absolute; right: 6px; top: 6px; width: 38px; height: 38px; border-radius: 50%;
+      background: var(--accent-cyan); border: none; color: #ffffff; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-search button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+
+    .car-btn {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 3;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(10,13,19,0.6); border: 1px solid rgba(255,255,255,0.15); color: #fff;
+      cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .car-btn:hover { background: rgba(10,13,19,0.9); }
+    .car-prev { left: 14px; } .car-next { right: 14px; }
+    .car-dots { position: absolute; bottom: 14px; left: 0; right: 0; display: flex; gap: 8px; justify-content: center; z-index: 3; }
+    .car-dot { width: 8px; height: 8px; border-radius: 99px; border: none; padding: 0; cursor: pointer; background: rgba(255,255,255,0.35); transition: all 0.25s; }
+    .car-dot.active { width: 24px; background: #fff; }
+
+    /* ── TRUST BAR ── */
+    .trust { max-width: 1200px; margin: 0 auto; padding: 20px 24px 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .trust-item { display: flex; align-items: center; gap: 12px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; }
+    .trust-ico { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 12px; background: rgba(91,108,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.15rem; }
+    .trust-item b { display: block; font-size: 0.88rem; }
+    .trust-item span { font-size: 0.75rem; color: var(--text-muted); }
+
+    /* ── STATS ── */
+    .stats-row { display: flex; gap: 14px; flex-wrap: wrap; }
+    .stat { flex: 1 1 160px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; }
+    .stat-val { font-family: var(--font-head); font-size: 1.9rem; font-weight: 800; color: var(--accent-cyan); letter-spacing: -0.5px; }
+    .stat-lbl { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+
+    /* ── HOW IT WORKS ── */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .step { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+    .step-num { width: 34px; height: 34px; border-radius: 10px; background: var(--accent-cyan); color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+    .step h3 { font-size: 1.02rem; margin-bottom: 6px; }
+    .step p { font-size: 0.86rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* ── FAQ ── */
+    .faq { max-width: 820px; display: flex; flex-direction: column; gap: 10px; }
+    .faq details { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); }
+    .faq summary { cursor: pointer; list-style: none; padding: 16px 18px; font-weight: 600; font-size: 0.92rem; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary::after { content: '+'; font-size: 1.3rem; color: var(--accent-cyan); transition: transform 0.2s; }
+    .faq details[open] summary::after { transform: rotate(45deg); }
+    .faq details p { padding: 0 18px 18px; color: var(--text-secondary); font-size: 0.88rem; line-height: 1.65; }
+
+    /* ── CTA BAND ── */
+    .cta-band { background: linear-gradient(120deg, #12263f, #261647); border: 1px solid var(--border); border-radius: 20px; padding: 36px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+    .cta-band h2 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.4px; }
+    .cta-band p { color: var(--text-secondary); margin-top: 4px; }
+
+    /* ── WHY / PROCESS (Buyacc-style) ── */
+    .why-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .why-card { background: linear-gradient(160deg, #121c3a, var(--bg-card) 60%); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+    .why-ico { width: 44px; height: 44px; border-radius: 12px; background: rgba(91,108,255,0.16); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
+    .why-card h3 { font-size: 1.02rem; margin-bottom: 6px; }
+    .why-card p { color: var(--text-secondary); font-size: 0.86rem; line-height: 1.6; margin-bottom: 10px; }
+    .why-card small { color: #8ea0f5; font-size: 0.75rem; font-weight: 600; }
+    .process { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+    .proc-col { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+    .proc-col h3 { font-size: 1.05rem; margin-bottom: 14px; }
+    .proc-col ol { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 16px; }
+    .proc-col li { counter-increment: s; position: relative; padding-left: 40px; }
+    .proc-col li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%; background: var(--accent-cyan); color: #fff; font-size: 0.78rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+    .proc-col li b { display: block; font-size: 0.92rem; margin-bottom: 2px; }
+    .proc-col li span { color: var(--text-secondary); font-size: 0.84rem; line-height: 1.55; }
+
+    @media (max-width: 960px) {
+      .why-grid { grid-template-columns: 1fr; }
+      .process { grid-template-columns: 1fr; }
+      .trust { grid-template-columns: repeat(2, 1fr); }
+      .slide { padding: 40px 36px; }
+      .slide-emoji { font-size: 5.5rem; right: 28px; }
+    }
+    @media (max-width: 768px) {
+      .hero-wrap { padding: 12px 16px 0; }
+      .trust { padding: 12px 16px 0; gap: 8px; }
+      .trust-item { padding: 10px 12px; gap: 10px; }
+      .trust-ico { width: 34px; height: 34px; flex-basis: 34px; font-size: 1rem; }
+      .trust-item b { font-size: 0.8rem; } .trust-item span { font-size: 0.7rem; }
+      .carousel { border-radius: 16px; }
+      .slide { min-height: 380px; padding: 30px 20px 48px; }
+      .slide-emoji { display: none; }
+      .slide p { font-size: 0.92rem; }
+      .car-btn { display: none; }
+      .steps { grid-template-columns: 1fr; }
+      .cta-band { padding: 24px 20px; }
+    }
+    @media (max-width: 420px) {
+      .trust { grid-template-columns: 1fr 1fr; }
+      .trust-item { flex-direction: column; align-items: flex-start; }
+      .slide-actions .btn { flex: 1 1 100%; }
+    }
+  </style>
+  <!-- Firebase SDK (Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+  <!-- Firebase Init -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5-g1bjXfgd1w9boHbfLX8EMnt6tr9yuM",
+      authDomain: "gbhub-25a16.firebaseapp.com",
+      projectId: "gbhub-25a16",
+      storageBucket: "gbhub-25a16.firebasestorage.app",
+      messagingSenderId: "1031854442872",
+      appId: "1:1031854442872:web:208bc4663cace89f43608d",
+      measurementId: "G-XV7WMV0Q82",
+      databaseURL: "https://gbhub-25a16-default-rtdb.asia-southeast1.firebasedatabase.app/",
+    };
+    if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+  </script>
+</head>
+<body>
+
+<!-- Navbar injected by navbar-template.js -->
+
+<!-- ═══ MODAL ═══ -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Trade Details</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Edit Trade Overlay -->
+<div id="editTradeOverlay" class="modal-overlay" onclick="if(event.target===this)closeEditTradeModal()"></div>
+
+<!-- ═══ HERO CAROUSEL ═══ -->
+<section class="hero-wrap" aria-label="Featured">
+  <div class="carousel" id="carousel">
+    <div class="slides" id="slides">
+      <div class="slide slide-1">
+        <span class="slide-kicker">Live trading platform</span>
+        <h1>Trade your way to <em>gaming glory</em></h1>
+        <p>Buy, sell, and trade in-game items, accounts, and resources with real players. Fast, secure, and community-driven.</p>
+        <form class="hero-search" onsubmit="return submitHeroSearch(event)" role="search">
+          <input type="text" id="heroSearchInput" placeholder="Search items, accounts, games" autocomplete="off">
+          <button type="submit" aria-label="Search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+        </form>
+        <div class="slide-emoji" aria-hidden="true">🎮</div>
+      </div>
+      <div class="slide slide-2">
+        <span class="slide-kicker">Got items to trade?</span>
+        <h2>Turn unused loot into <em>something new</em></h2>
+        <p>Post your trade in under a minute, set what you want in return, and let offers come to you.</p>
+        <div class="slide-actions">
+          <a href="post-trade.html" class="btn btn-orange" onclick="return checkLogin(this.href)">➕ Post a trade</a>
+          <a href="browse.html" class="btn btn-ghost">Browse trades</a>
+        </div>
+        <div class="slide-emoji" aria-hidden="true">🎁</div>
+      </div>
+      <div class="slide slide-3">
+        <span class="slide-kicker">Trade with confidence</span>
+        <h2>Chat, offer &amp; <em>confirm together</em></h2>
+        <p>Talk to traders in built-in chat, send offers, and complete the trade only when both sides confirm.</p>
+        <div class="slide-actions">
+          <a href="register.html" class="btn btn-primary">Create free account</a>
+          <a href="#how-it-works" class="btn btn-ghost">How it works</a>
+        </div>
+        <div class="slide-emoji" aria-hidden="true">🤝</div>
+      </div>
+    </div>
+    <button class="car-btn car-prev" id="carPrev" aria-label="Previous slide">‹</button>
+    <button class="car-btn car-next" id="carNext" aria-label="Next slide">›</button>
+    <div class="car-dots" id="carDots"></div>
+  </div>
+</section>
+
+<!-- ═══ POPULAR GAMES ═══ -->
+<div class="section" style="padding-bottom:8px">
+  <div class="section-header">
+    <div class="section-title">Popular Games</div>
+    <a href="browse.html" class="btn btn-ghost" style="font-size:0.8rem">All games →</a>
+  </div>
+  <div class="pop-games" id="popGames"></div>
+</div>
+
+<!-- ═══ LATEST TRADES ═══ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">Newly Listed</div>
+    <a href="browse.html" class="btn btn-ghost" style="font-size:0.8rem">See More →</a>
+  </div>
+  <div class="trades-grid" id="homeTradesGrid"></div>
+</div>
+
+<!-- ═══ WHY CHOOSE US ═══ -->
+<div class="section">
+  <div class="section-header"><div class="section-title">Why Choose Us</div></div>
+  <div class="why-grid">
+    <div class="why-card"><div class="why-ico">🛡️</div><h3>Trade Protection</h3><p>A trade only completes when both sides confirm it.</p><small>Offers and chat stay on-platform</small></div>
+    <div class="why-card"><div class="why-ico">⚡</div><h3>Simple Process</h3><p>Post what you have, say what you want, and let offers come to you.</p><small>Built-in chat and counter-offers</small></div>
+    <div class="why-card"><div class="why-ico">⭐</div><h3>Trusted Traders</h3><p>Verified badges and post-trade ratings help you pick who to trade with.</p><small>Help is one tap away with support tickets</small></div>
+  </div>
+</div>
+
+<!-- ═══ PROCESS ═══ -->
+<div class="section" id="how-it-works">
+  <div class="section-header"><div class="section-title">Simple Steps to Trade</div></div>
+  <div class="process">
+    <div class="proc-col">
+      <h3>Trader Process</h3>
+      <ol>
+        <li><b>Browse &amp; Choose</b><span>Search by game or item and find the listing you want.</span></li>
+        <li><b>Make an Offer</b><span>Tell the owner what you'll give in exchange, and chat to settle the details.</span></li>
+        <li><b>Owner Accepts</b><span>The owner can accept, decline, or send a counter-offer.</span></li>
+        <li><b>Confirm &amp; Rate</b><span>Both sides confirm the trade, then leave a rating.</span></li>
+      </ol>
+    </div>
+    <div class="proc-col">
+      <h3>Poster Process</h3>
+      <ol>
+        <li><b>Post a Trade</b><span>Add photos, a description, and what you're looking for. Listing is free.</span></li>
+        <li><b>Review Offers</b><span>Offers arrive in your inbox. Chat with offerers before deciding.</span></li>
+        <li><b>Complete the Trade</b><span>Once both of you confirm, the listing is marked sold.</span></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ LEARN MORE ═══ -->
+<div class="section" id="faq">
+  <div class="section-header"><div class="section-title">Learn more about GameBarterHub</div></div>
+  <div class="faq">
+    <details><summary>What is GameBarterHub?</summary><p>A community marketplace where players trade in-game items, accounts, and resources with each other, instead of paying cash.</p></details>
+    <details><summary>Is it safe to trade here?</summary><p>Every trade needs both sides to confirm, chats and offers stay on the platform, and traders can earn verified badges and ratings. Never share your password outside a trade you've agreed to, and open a support ticket if something looks off.</p></details>
+    <details><summary>How do I post a trade?</summary><p>Create an account, tap <b>Post</b>, pick the game, add photos and tell people what you're looking for in return.</p></details>
+    <details><summary>What can I trade?</summary><p>In-game items, accounts, and resources across the games listed on the site. Pick the matching game when you post.</p></details>
+    <details><summary>Is GameBarterHub free?</summary><p>Yes. Creating an account and posting trades doesn't cost anything.</p></details>
+  </div>
+</div>
+
+<!-- ═══ CTA ═══ -->
+<div class="section" style="padding-top:8px">
+  <div class="cta-band">
+    <div><h2>Ready to make your first trade?</h2><p>Join the community and start trading in minutes.</p></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <a href="register.html" class="btn btn-primary">Sign up free</a>
+      <a href="browse.html" class="btn btn-ghost">Browse trades</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script src="js/data.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/navbar.js"></script>
+<script src="js/notification.js"></script>
+<script src="js/call.js"></script>
+<script src="js/navbar-template.js"></script>
+<script src="js/support.js"></script>
+<script src="js/chat.js"></script>
+<script src="js/trades.js"></script>
+<script src="js/offers.js"></script>
+<script>
+  function renderPopularGames() {
+    const counts = {};
+    state.trades.forEach(t => { counts[t.game] = (counts[t.game] || 0) + 1; });
+    // games with the most listings first, then the rest in default order
+    const sorted = [...GAMES].sort((x, y) => (counts[y.id] || 0) - (counts[x.id] || 0)).slice(0, 8);
+    document.getElementById('popGames').innerHTML = sorted.map(g => {
+      const n = counts[g.id] || 0;
+      return `<a class="pop-game" href="browse.html?game=${g.id}">
+        <span class="pg-ico">${g.icon}</span><b>${g.name}</b><span>${n.toLocaleString()} ${n === 1 ? 'trade' : 'trades'}</span></a>`;
+    }).join('');
+  }
+
+  function renderLatestTrades() {
+    const recent = state.trades.slice(0, 6);
+    document.getElementById('homeTradesGrid').innerHTML =
+      recent.map(t => tradeCardHTML(t)).join('');
+    renderPopularGames();
+  }
+
+
+  // Hero search — sends the user to Browse with the query prefilled
+  function submitHeroSearch(e) {
+    e.preventDefault();
+    const q = document.getElementById('heroSearchInput').value.trim();
+    window.location.href = q
+      ? `browse.html?q=${encodeURIComponent(q)}`
+      : 'browse.html';
+    return false;
+  }
+
+
+  // ── Hero carousel ──
+  (function initCarousel() {
+    const slides = document.getElementById('slides');
+    const dotsEl = document.getElementById('carDots');
+    if (!slides) return;
+    const count = slides.children.length;
+    let idx = 0, timer = null, startX = null;
+    dotsEl.innerHTML = Array.from({ length: count }, (_, i) =>
+      `<button class="car-dot${i === 0 ? ' active' : ''}" aria-label="Go to slide ${i + 1}" data-i="${i}"></button>`).join('');
+    function go(i) {
+      idx = (i + count) % count;
+      slides.style.transform = `translateX(-${idx * 100}%)`;
+      dotsEl.querySelectorAll('.car-dot').forEach((d, n) => d.classList.toggle('active', n === idx));
+    }
+    function play() { stop(); timer = setInterval(() => go(idx + 1), 6000); }
+    function stop() { if (timer) clearInterval(timer); }
+    document.getElementById('carPrev').onclick = () => { go(idx - 1); play(); };
+    document.getElementById('carNext').onclick = () => { go(idx + 1); play(); };
+    dotsEl.onclick = e => { const b = e.target.closest('.car-dot'); if (b) { go(+b.dataset.i); play(); } };
+    const car = document.getElementById('carousel');
+    car.addEventListener('mouseenter', stop);
+    car.addEventListener('mouseleave', play);
+    car.addEventListener('focusin', stop);
+    car.addEventListener('touchstart', e => { startX = e.touches[0].clientX; stop(); }, { passive: true });
+    car.addEventListener('touchend', e => {
+      if (startX !== null) {
+        const dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+      }
+      startX = null; play();
+    });
+    play();
+  })();
+
+  // Load from API on page load
+  (async () => {
+    await loadTrades();
+    renderLatestTrades();
+  })();
+</script>
+</body>
+</html>
